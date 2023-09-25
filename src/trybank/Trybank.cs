@@ -24,12 +24,12 @@ public class Trybank
     public void RegisterAccount(int number, int agency, int pass)
     {
         for(int i = 0; i < registeredAccounts; i++)
-    {
-        if(Bank[i, 0] == number && Bank[i, 1] == agency)
         {
-            throw new ArgumentException("A conta já está sendo usada!");
+            if(Bank[i, 0] == number && Bank[i, 1] == agency)
+            {
+                throw new ArgumentException("A conta já está sendo usada!");
+            }
         }
-    }
 
     Bank[registeredAccounts, 0] = number;
     Bank[registeredAccounts, 1] = agency;
@@ -42,46 +42,44 @@ public class Trybank
     public void Login(int number, int agency, int pass)
     {
         if (Logged)
-    {
-        throw new AccessViolationException("Usuário já está logado");
-    }
-
-    int index = -1;
-    for (int i = 0; i < registeredAccounts; i++)
-    {
-        if (Bank[i, 0] == number && Bank[i, 1] == agency)
         {
-            if (Bank[i, 2] == pass)
+            throw new AccessViolationException("Usuário já está logado");
+        }
+        int index = -1;
+        for (int i = 0; i < registeredAccounts; i++)
+        {
+            if (Bank[i, 0] == number && Bank[i, 1] == agency)
             {
-                index = i;
-                break;
-            }
-            else
-            {
-                throw new ArgumentException("Senha incorreta");
+                if (Bank[i, 2] == pass)
+                {
+                    index = i;
+                    break;
+                }
+                else
+                {
+                    throw new ArgumentException("Senha incorreta");
+                }
             }
         }
-    }
+        if (index == -1)
+        {
+            throw new ArgumentException("Agência + Conta não encontrada");
+        }
 
-    if (index == -1)
-    {
-        throw new ArgumentException("Agência + Conta não encontrada");
-    }
-
-    loggedUser = index;
-    Logged = true;
+        loggedUser = index;
+        Logged = true;
     }
 
     // 3. Construa a funcionalidade de fazer Logout
     public void Logout()
     {
         if (!Logged)
-    {
-        throw new AccessViolationException("Usuário não está logado");
-    }
+        {
+            throw new AccessViolationException("Usuário não está logado");
+        }
 
-    Logged = false;
-    loggedUser = -99;
+        Logged = false;
+        loggedUser = -99;
     }
 
     // 4. Construa a funcionalidade de checar o saldo
@@ -97,13 +95,26 @@ public class Trybank
     // 5. Construa a funcionalidade de depositar dinheiro
     public void Deposit(int value)
     {
-        throw new NotImplementedException();
+        if (!Logged)
+        {
+            throw new AccessViolationException("Usuário não está logado");
+        }
+        Bank[loggedUser, 3] += value;
     }
 
     // 6. Construa a funcionalidade de sacar dinheiro
     public void Withdraw(int value)
     {
-        throw new NotImplementedException();
+        if (!Logged)
+        {
+            throw new AccessViolationException("Usuário não está logado");
+        }
+        if (Bank[loggedUser, 3] - value < 0)
+        {
+            throw new InvalidOperationException("Saldo insuficiente");
+        }
+
+        Bank[loggedUser, 3] -= value;
     }
 
     // 7. Construa a funcionalidade de transferir dinheiro entre contas
